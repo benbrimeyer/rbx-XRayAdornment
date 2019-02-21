@@ -65,48 +65,48 @@ This snippet will grant you a "silhoutte" effect when your camera is hidden behi
 		-- otherwise you can walk behind a non-Collidable screen
  
 ```
-  -- Put this in the Player's PlayerScript somehow
-	local localPlayer = game:GetService("Players").LocalPlayer
-	local myCharacter = localPlayer.Character or localPlayer.CharacterAppearanceLoaded:wait()
-	local XRayAdornment = require(script.XRayAdornment)
+-- Put this in the Player's PlayerScript somehow
+local localPlayer = game:GetService("Players").LocalPlayer
+local myCharacter = localPlayer.Character or localPlayer.CharacterAppearanceLoaded:wait()
+local XRayAdornment = require(script.XRayAdornment)
 
-	local myShadowAdornments = {}
-	local function onNewCharacter(character)
-		-- pass on new character reference
-		myCharacter = character
-		-- reset adornments from last character (should probably clean this on death instead)
-		for _, oldAdornment in pairs(myShadowAdornments) do
-			oldAdornment:Destroy()
-		end
-		myShadowAdornments = {}
-
-		for _, Object in pairs(character:GetDescendants()) do
-			if Object:IsA("BasePart") and Object.Transparency < 0.95 then
-				local myXRayAdornment = XRayAdornment.new(Object)
-				myXRayAdornment.SelectionPart.Color = BrickColor.new("Storm blue").Color
-				table.insert(myShadowAdornments, myXRayAdornment)
-			end
-		end
-
+local myShadowAdornments = {}
+local function onNewCharacter(character)
+	-- pass on new character reference
+	myCharacter = character
+	-- reset adornments from last character (should probably clean this on death instead)
+	for _, oldAdornment in pairs(myShadowAdornments) do
+		oldAdornment:Destroy()
 	end
-	localPlayer.CharacterAppearanceLoaded:connect(onNewCharacter)
-	onNewCharacter(myCharacter)
+	myShadowAdornments = {}
 
-	-- this loop will only show shadows when we are hidden
-	game:GetService("RunService"):BindToRenderStep("OcculsionCheck", Enum.RenderPriority.Character.Value, function()
-		local primaryPart = myCharacter.PrimaryPart
-		if primaryPart then
-			local camera = workspace.CurrentCamera
-			local occluded = false
-			local objectList = camera:GetPartsObscuringTarget({primaryPart.Position}, {camera, myCharacter})
-			for _, object in pairs(objectList) do
-				if object.Transparency < 0.95 then
-					occluded = true
-					break
-				end
-			end
-			for _, adornment in pairs(myShadowAdornments) do
-				adornment.Enabled = occluded
+	for _, Object in pairs(character:GetDescendants()) do
+		if Object:IsA("BasePart") and Object.Transparency < 0.95 then
+			local myXRayAdornment = XRayAdornment.new(Object)
+			myXRayAdornment.SelectionPart.Color = BrickColor.new("Storm blue").Color
+			table.insert(myShadowAdornments, myXRayAdornment)
+		end
+	end
+
+end
+localPlayer.CharacterAppearanceLoaded:connect(onNewCharacter)
+onNewCharacter(myCharacter)
+
+-- this loop will only show shadows when we are hidden
+game:GetService("RunService"):BindToRenderStep("OcculsionCheck", Enum.RenderPriority.Character.Value, function()
+	local primaryPart = myCharacter.PrimaryPart
+	if primaryPart then
+		local camera = workspace.CurrentCamera
+		local occluded = false
+		local objectList = camera:GetPartsObscuringTarget({primaryPart.Position}, {camera, myCharacter})
+		for _, object in pairs(objectList) do
+			if object.Transparency < 0.95 then
+				occluded = true
+				break
 			end
 		end
-	end)```
+		for _, adornment in pairs(myShadowAdornments) do
+			adornment.Enabled = occluded
+		end
+	end
+end)```
